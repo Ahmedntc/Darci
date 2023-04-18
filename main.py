@@ -1,5 +1,10 @@
 import discord
- 
+import json
+
+js = open('config.json')
+data = json.load(js)
+
+
 intents = discord.Intents.all()
 client = discord.Client(command_prefix='!', intents=intents)
  
@@ -14,5 +19,6 @@ async def on_message(message):
  
     if message.content.startswith('hi'):
         await message.channel.send('Hello!')
- 
-client.run('MTA5NzkzNjUyODUyMjYxMjc4OQ.GpIicx.7NRtJHtuNYlOL_bkNOD4jXnMHOMfdm3EvNcYMI')
+        
+
+client.run(data['token'])
