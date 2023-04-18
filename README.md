@@ -1,2 +1,2 @@
-# d.a.r.c.i
-Image classifier discord bot
+# D.A.R.C.I
+## Image classifier discord bot
