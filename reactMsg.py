@@ -1,6 +1,8 @@
 import discord
 import requests
 import json
+import urllib.request
+import tarfile
 
 js = open('config.json')
 data = json.load(js)
@@ -16,10 +18,16 @@ async def on_ready():
  
 @client.event
 async def on_message(message):
+    
     print("message-->", message)
     print("message content-->", message.content)
     print("message attachments-->", message.attachments)
     print("message id", message.author.id)
+    print("channel id", message.channel.id)
+    print("server id", message.guild.id)
+    
+    server_id = int(message.guild.id)
+    channel_id = int(message.channel.id)
     a_id = message.author.id
     if a_id != data['token']:
         for x in message.attachments:
@@ -34,26 +42,19 @@ async def on_message(message):
     
     if message.author == client.user:
         return
+    
+    if server_id == data['piserver_id']:
+        if channel_id == data['pichannel_id']:
+            for msg in message.attachments:
+                for ext in pic_ext:
+                    if file_name.endswith(ext):
+                        await message.channel.send('Imagem: ' + file_name)
+    else:
+        for msg in message.attachments:
+            for ext in pic_ext:
+                if file_name.endswith(ext):
+                    await message.channel.send('Imagem: ' + file_name)    
 
-    for msg in message.attachments:
-        for ext in pic_ext:
-            if file_name.endswith(ext):
-                await message.channel.send('Imagem: ' + file_name)    
-
-"""     if message.content.startswith('hi'):
-        await message.channel.send('Hello!')
- 
-    if message.content.startswith('image'):
-        await message.channel.send(file=discord.File('download.jpg'))
- 
-    if message.content.startswith('video'):
-        await message.channel.send(file=discord.File('sample-mp4-file-small.mp4'))
- 
-    if message.content.startswith('audio'):
-        await message.channel.send(file=discord.File('file_example_MP3_700KB.mp3'))
- 
-    if message.content.startswith('file'):
-        await message.channel.send(file=discord.File('sample.pdf')) """
  
         
 client.run(data['token'])
