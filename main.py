@@ -3,6 +3,8 @@ import requests
 import json
 import urllib.request
 import tarfile
+import helpMenu
+
 
 js = open('config.json')
 data = json.load(js)
@@ -43,18 +45,27 @@ async def on_message(message):
     if message.author == client.user:
         return
     
-    if server_id == data['piserver_id']:
-        if channel_id == data['pichannel_id']:
+    cmds = message.content.split(" ")
+    if "!help" in message.content or "!h" in message.content:
+        await message.channel.send(helpMenu.help())
+        return
+    if "!classify" in message.content or "!c" in message.content:
+        if server_id == data['piserver_id']:
+            if channel_id == data['pichannel_id']:
+                if message.attachments == []:
+                    await message.channel.send('Não há imagem anexada')
+                for msg in message.attachments:
+                    for ext in pic_ext:
+                        if file_name.endswith(ext):
+                            await message.channel.send('Imagem: ' + file_name)
+        else:
+            if message.attachments == []:
+                await message.channel.send('Não há imagem anexada')    
             for msg in message.attachments:
                 for ext in pic_ext:
                     if file_name.endswith(ext):
-                        await message.channel.send('Imagem: ' + file_name)
-    else:
-        for msg in message.attachments:
-            for ext in pic_ext:
-                if file_name.endswith(ext):
-                    await message.channel.send('Imagem: ' + file_name)    
+                        await message.channel.send('Imagem: ' + file_name)  
 
- 
-        
+                          
+      
 client.run(data['token'])
