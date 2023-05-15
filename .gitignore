@@ -1,1 +1,4 @@
 config.json
+model_covid.h5
+.vscode
+CovidModel.ipynb

@@ -12,7 +12,7 @@ ________          _____      __________    _________      .___
 
 - !h, !help: Show this help message and exit
 - !c, !classify: Classify an image
-
+- !e, !explain: Explain what the bot does
 ```	
 
 """

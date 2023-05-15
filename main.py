@@ -1,9 +1,11 @@
 import discord
 import requests
 import json
-import urllib.request
-import tarfile
 import helpMenu
+import tensorflow as tf
+import cv2
+import os
+import numpy as np
 
 
 js = open('config.json')
@@ -12,6 +14,9 @@ data = json.load(js)
 intents = discord.Intents.all()
 client = discord.Client(command_prefix='!', intents=intents)
 
+
+# Carregar modelo
+model = tf.keras.saving.load_model("model/model_covid.h5")
 
 
 @client.event
@@ -37,8 +42,10 @@ async def on_message(message):
             d_url = requests.get(x.url)
             file_name = x.url.split('/')[-1]
             #code to save the file locally
-            #with open(file_name, "wb") as f:
-                #f.write(d_url.content)
+            with open(file_name, "wb") as f:
+                f.write(d_url.content)
+                f.close()
+                
     pic_ext = ['.jpg','.png','.jpeg']
     
     
@@ -48,6 +55,9 @@ async def on_message(message):
     cmds = message.content.split(" ")
     if "!help" in message.content or "!h" in message.content:
         await message.channel.send(helpMenu.help())
+        return
+    if "!explain" in message.content or "!e" in message.content:
+        await message.channel.send("Este bot classifica imagens de radiografias de pulmão saudáveis ou com covid.")
         return
     if "!classify" in message.content or "!c" in message.content:
         if server_id == data['piserver_id']:
@@ -64,7 +74,23 @@ async def on_message(message):
             for msg in message.attachments:
                 for ext in pic_ext:
                     if file_name.endswith(ext):
-                        await message.channel.send('Imagem: ' + file_name)  
+                        image_size = (256, 256)
+                        imagem = cv2.imread(file_name)
+                        imagem = cv2.resize(imagem, image_size)
+                        imagem = imagem.reshape((1,256,256,3))
+                        imagem = tf.cast(imagem/255. ,tf.float32)
+                        label = model.predict(imagem)
+                        os.remove(file_name)
+                        await message.channel.send(label[0][0])
+                        k = int(label[0][0])
+                        await message.channel.send(k)
+                        classes = ["Covid", "Saudável"]
+                        await message.channel.send("Esta imagem corresponde a " + classes[k])
+                        
+                        
+                        
+                        
+                        
 
                           
       
