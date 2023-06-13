@@ -41,11 +41,12 @@ async def on_message(message):
             print("attachment-->",x.url)
             d_url = requests.get(x.url)
             file_name = x.url.split('/')[-1]
-            #code to save the file locally
-            with open(file_name, "wb") as f:
-                f.write(d_url.content)
-                f.close()
-                
+            #code to save the file locally when the classify command is used
+            if "!classify" in message.content or "!c" in message.content:
+                with open(file_name, "wb") as f:
+                    f.write(d_url.content)
+                    f.close()
+
     pic_ext = ['.jpg','.png','.jpeg']
     
     
@@ -61,23 +62,23 @@ async def on_message(message):
             if "!explain" in message.content or "!e" in message.content:
                 await message.channel.send("Este bot classifica imagens de radiografias de pulmão saudáveis ou com covid.")
                 return
-        if "!classify" in message.content or "!c" in message.content:
-            if message.attachments == []:
-                await message.channel.send('Não há imagem anexada') 
-            for msg in message.attachments:
-                for ext in pic_ext:
-                    if file_name.endswith(ext):
-                        image_size = (256, 256)
-                        imagem = cv2.imread(file_name)
-                        imagem = cv2.resize(imagem, image_size)
-                        imagem = imagem.reshape((1,256,256,3))
-                        imagem = tf.cast(imagem/255. ,tf.float32)
-                        label = model.predict(imagem)
-                        os.remove(file_name)
-                        await message.channel.send(label[0][0])
-                        k = int(label[0][0])
-                        classes = ["Covid", "Saudável"]
-                        await message.channel.send("Esta imagem corresponde a " + classes[k])
+            if "!classify" in message.content or "!c" in message.content:
+                if message.attachments == []:
+                    await message.channel.send('Não há imagem anexada') 
+                for msg in message.attachments:
+                    for ext in pic_ext:
+                        if file_name.endswith(ext):
+                            image_size = (256, 256)
+                            imagem = cv2.imread(file_name)
+                            imagem = cv2.resize(imagem, image_size)
+                            imagem = imagem.reshape((1,256,256,3))
+                            imagem = tf.cast(imagem/255. ,tf.float32)
+                            label = model.predict(imagem)
+                            os.remove(file_name)
+                            await message.channel.send(f"Valor dado pelo modelo: {label[0][0]}")
+                            k = int(label[0][0])
+                            classes = ["Covid", "Saudável"]
+                            await message.channel.send("Esta imagem corresponde a " + classes[k])
                         
     else:
         if "!help" in message.content or "!h" in message.content:
@@ -99,10 +100,12 @@ async def on_message(message):
                         imagem = tf.cast(imagem/255. ,tf.float32)
                         label = model.predict(imagem)
                         os.remove(file_name)
-                        await message.channel.send(label[0][0])
+                        await message.channel.send(f"Valor dado pelo modelo: {label[0][0]}")
                         k = int(label[0][0])
                         classes = ["Covid", "Saudável"]
                         await message.channel.send("Esta imagem corresponde a " + classes[k])
+                
+                        
             
             
 client.run(data['token'])
