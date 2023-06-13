@@ -1,5 +1,5 @@
 config.json
-model_covid.h5
+__pycache__
 .vscode
 CovidModel.ipynb
-dataset
+
